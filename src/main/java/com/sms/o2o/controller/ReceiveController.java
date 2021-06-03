@@ -10,6 +10,7 @@ import com.sms.o2o.model.Report;
 import com.sms.o2o.model.ReportData;
 import com.sms.o2o.model.Result;
 import com.sms.o2o.model.ResultByte;
+import com.sms.o2o.model.ResultStarBucks;
 import com.sms.o2o.model.Statistics;
 import com.sms.o2o.model.Upstream;
 import com.sms.o2o.model.UpstreamData;
@@ -117,7 +118,7 @@ public class ReceiveController {
         return result;
     }
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    //@Scheduled(cron = "*/10 * * * * ?")
     public void outCount(){
         log.error("count: " + countHuiTong);
         log.error("countUpstream: " + countHuiTongUpStream);
@@ -234,6 +235,28 @@ public class ReceiveController {
             receiveService.batchAddUp(upstreams);
         }
         result.setCode("0");
+        return result;
+    }
+
+    @RequestMapping("/starBucks")
+    public ResultStarBucks starBucks(HttpServletRequest request){
+        ResultStarBucks result = new ResultStarBucks();
+        ResultStarBucks.BodyBean bodyBean = new ResultStarBucks.BodyBean();
+        result.setBody(bodyBean);
+        String body;
+        try {
+            body = getBody(request);
+            log.error(body);
+        } catch (Exception e) {
+            log.error("upstream body error {}", e.getMessage());
+            result.getBody().setErrorCode(-1);
+            return result;
+        }
+        String authorization = request.getHeader("Authorization");
+        String timestamp = request.getHeader("Timestamp");
+        String appKey = request.getHeader("AppKey");
+        log.error("{}\t{}\t{}", authorization, timestamp, appKey);
+        result.getBody().setErrorCode(0);
         return result;
     }
 
